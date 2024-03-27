@@ -4,7 +4,7 @@
 
 void positionCallback(const std_msgs::UInt16::ConstPtr& msg)
 {
-    ROS_INFO("position = %u", msg->data.c_str());
+    ROSINFO("position = %u", msg->data.c_str());
 }
 
 int main(int argc, char **argv)

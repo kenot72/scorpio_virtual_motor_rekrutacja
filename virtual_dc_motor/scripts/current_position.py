@@ -33,5 +33,6 @@ if __name__ == '__main__':
     sub0 = rospy.Subscriber("/virtual_dc_motor_node/get_position_0", UInt16, callback=callback0)
     sub1 = rospy.Subscriber("/virtual_dc_motor_node/get_position_1", UInt16, callback=callback1)
     sub2 = rospy.Subscriber("/virtual_dc_motor_node/get_position_2", UInt16, callback=callback2)
+    rospy.loginfo("\n")
 
     rospy.spin()
