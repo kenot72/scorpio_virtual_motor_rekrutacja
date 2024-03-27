@@ -12,10 +12,12 @@ from std_msgs.msg import Int8
 def saveTerminalSettings():
     return termios.tcgetattr(sys.stdin)
 
-def if_key_pushed_move(key, var, char1, char2):
+def if_key_pushed_move(key, var, char1, char2, motor):
     if key == char1 and var > -100:
+        rospy.loginfo("motor " + str(motor) + ": " + str(var-1))
         return var-1
     elif key == char2 and var < 100:
+        rospy.loginfo("motor " + str(motor) + ": " + str(var+1))
         return var+1
     else:
         return var
@@ -32,7 +34,7 @@ def getKey(settings, timeout):
 
 if __name__ == '__main__':
     rospy.init_node("motor_control")
-    rospy.loginfo("Node has been started")
+    rospy.loginfo("Motor 0:\n left control q \n right control: e\nMotor 1:\n left control a \n right control: d\nMotor 2:\n left control z \n right control: c\n To disable/enable Motor control: b")
 
     settings = saveTerminalSettings()
     key_timeout = rospy.get_param("~key_timeout", 0.5)
@@ -45,22 +47,33 @@ if __name__ == '__main__':
     x1 = 0
     x2 = 0
 
-    rate = rospy.Rate(2)
+    state = True
+
+    rate = rospy.Rate(20)
 
     while not rospy.is_shutdown():
         key = getKey(settings, key_timeout)
 
-        msg0 = Int8()
-        msg1 = Int8()
-        msg2 = Int8()
-        x0 = if_key_pushed_move(key, x0, 'q', 'e')
-        x1 = if_key_pushed_move(key, x1, 'a', 'd')
-        x2 = if_key_pushed_move(key, x2, 'z', 'c')
-        msg0.data = x0
-        msg1.data = x1
-        msg2.data = x2
-        pub0.publish(msg0)
-        pub1.publish(msg1)
-        pub2.publish(msg2)
+        if key == 'b':
+            if state == True:
+                state = False
+                rospy.loginfo("Motor control: disabled")
+            else:
+                state = True
+                rospy.loginfo("Motor control: enabled")
+        if state == True:
+            msg0 = Int8()
+            msg1 = Int8()
+            msg2 = Int8()
+            if key != '':
+                x0 = if_key_pushed_move(key, x0, 'q', 'e', 0)
+                x1 = if_key_pushed_move(key, x1, 'a', 'd', 1)
+                x2 = if_key_pushed_move(key, x2, 'z', 'c', 2)
+            msg0.data = x0
+            msg1.data = x1
+            msg2.data = x2
+            pub0.publish(msg0)
+            pub1.publish(msg1)
+            pub2.publish(msg2)
         
         rate.sleep()
