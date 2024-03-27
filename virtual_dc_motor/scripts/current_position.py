@@ -5,7 +5,6 @@ from std_msgs.msg import UInt16
 
 def callback0(msg: UInt16):
     position = str(msg)
-    rospy.loginfo("position: " + position)
     res = [int(i) for i in position.split() if i.isdigit()]
     for x in res:
         rospy.loginfo("pozycja 0:" + str(round(x/(4096/360),2)))
